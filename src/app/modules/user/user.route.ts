@@ -8,7 +8,7 @@ import { Role as UserRole } from "@prisma/client";
 const router = express.Router();
 
 // Existing routes
-router.post("/",
+router.post("/register",
     fileUpload.upload.single("file"),
     (req: Request, res: Response, next: NextFunction) => {
         req.body = userValidation.createUserValidationSchema.parse(JSON.parse(req.body.data))

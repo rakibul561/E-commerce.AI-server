@@ -53,7 +53,7 @@ app.get("/", (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         statusCode: 200,
-        message: "Welcome to SMT-Project Backend API",
+        message: "Welcome to E commerce.AI-server",
         authenticated: req.isAuthenticated(),
     });
 });
