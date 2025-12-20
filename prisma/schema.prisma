@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SubscriptionTier {
+  FREE
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  CANCELLED
+  PAST_DUE
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+model User {
+  id            String        @id @default(auto()) @map("_id") @db.ObjectId
+  email         String        @unique
+  password      String
+  name          String?
+  profilePicture String?
+  role          Role          @default(USER)
+  isVerified    Boolean       @default(false)
+  googleId       String?      
+  authProvider   AuthProvider @default(LOCAL)
+  credits       Int           @default(20)
+  
+  subscription  Subscription?
+  products      Product[]
+  exports       Export[]
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  @@map("users")
+}
+
+model Subscription {
+  id                String              @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String              @unique @db.ObjectId
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  tier              SubscriptionTier    @default(FREE)
+  status            SubscriptionStatus  @default(INACTIVE)
+  
+  stripeCustomerId      String?         @unique
+  stripeSubscriptionId  String?         @unique
+  stripePriceId         String?
+  
+  currentPeriodStart    DateTime?
+  currentPeriodEnd      DateTime?
+  cancelAtPeriodEnd     Boolean         @default(false)
+  
+  creditsPerMonth   Int                 @default(10)
+  
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  @@map("subscriptions")
+}
+
+model Product {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String    @db.ObjectId
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title           String?
+  description     String?
+  category        String?
+  tags            String[]
+  keywords        String[]
+  
+  originalImage   String?   
+  generatedImages String[]  
+  videoLinks      String[] 
+  seoTitle        String?
+  seoDescription  String?
+  seoKeywords     String[]
+  
+  metadata        Json?    
+  
+  isDraft         Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("products")
+}
+
+model Export {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  platform    String   
+  productIds  String[]  @db.ObjectId
+  fileUrl     String?   
+  
+  createdAt   DateTime  @default(now())
+  
+  @@map("exports")
+}
+
+model CreditUsage {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String    @db.ObjectId
+  
+  action      String    
+  creditsUsed Int       @default(1)
+  
+  createdAt   DateTime  @default(now())
+  
+  @@map("credit_usage")
+}
