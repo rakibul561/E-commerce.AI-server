@@ -8,6 +8,7 @@ export default {
     port: process.env.PORT,
     database_url: process.env.DATABASE_URL,
 
+
     jwt: {
         accessToken: process.env.JWT_ACCESS_SECRET,
         refreshToken: process.env.JWT_REFRESH_SECRET
@@ -32,15 +33,15 @@ export default {
         stripeWebHookSecret: process.env.STRIPE_WEBHOOKS_SECRET,
         frontendUrl: process.env.FRONTEND_URL
     },
-   
+
     username: process.env.REDIS_USERNAME,
     password: process.env.REDIS_PASSWORD,
     redis: {
         host: process.env.REDIS_HOST,
         port: process.env.REDIS_PORT,
     },
-  
-  
+
+
 
     // Google OAuth (NEW)
     google: {
@@ -54,6 +55,15 @@ export default {
         secret: process.env.SESSION_SECRET || 'fallback-secret-change-this-in-production',
     },
 
-    
+    // admin
+    admin: {
+        email: process.env.ADMIN_EMAIL,
+        password: process.env.ADMIN_PASSWORD
+    },
+
+    bcrypt: {
+        saltRounds: process.env.BCRYPT_SALT || 10,
+    },
+
 
 }
