@@ -4,6 +4,7 @@ import app from "./app";
 import config from "./app/config";
 
 import { connectRedis } from "./app/config/redis.config";
+import { seedAdmin } from "./app/utils/seedAdmin";
 
 async function bootstrap() {
     let server: Server;
@@ -14,7 +15,7 @@ async function bootstrap() {
         // *  socket io ------------------
         server = http.createServer(app);
         // * Initialize Socket.IO
-      
+
 
 
         server.listen(config.port, () => {
@@ -47,4 +48,7 @@ async function bootstrap() {
     }
 }
 
-bootstrap();
+(async () => {
+    await bootstrap();
+    await seedAdmin();
+})();
