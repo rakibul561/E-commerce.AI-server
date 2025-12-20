@@ -10,8 +10,8 @@ export default {
 
 
     jwt: {
-        accessToken: process.env.JWT_ACCESS_SECRET,
-        refreshToken: process.env.JWT_REFRESH_SECRET
+        accessTokenSecret: process.env.JWT_ACCESS_SECRET,
+        refreshTokenSecret: process.env.JWT_REFRESH_SECRET
     },
 
     cloudinary: {
@@ -64,6 +64,8 @@ export default {
     bcrypt: {
         saltRounds: process.env.BCRYPT_SALT || 10,
     },
+
+    frontend_url: process.env.FRONTEND_URL
 
 
 }

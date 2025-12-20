@@ -11,7 +11,7 @@ const createUserValidationSchema = z.object({
   password: z.string()
     .min(10, { message: "Password must be at least 10 characters long" })
     .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
-    .regex(/[^a-zA-Z0-9]/, { message: "Password must contain at least one special character" }).optional(),
+    .regex(/[^a-zA-Z0-9]/, { message: "Password must contain at least one special character" }),
 
   role: z.enum(["USER", "ADMIN"]).optional(),
 

@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Request } from "express";
-import { fileUpload } from "../../utils/fileUpload";
-import ApiError from "../../errors/apiError";
 import bcrypt from "bcryptjs";
+import { Request, Response } from "express";
+import config from "../../config";
+import ApiError from "../../errors/apiError";
 import { prisma } from "../../prisma/prisma";
 import { PrismaQueryBuilder } from "../../utils/QueryBuilder";
+import catchAsync from "../../utils/catchAsync";
+import { fileUpload } from "../../utils/fileUpload";
+import { jwtHelper } from "../../utils/JwtHelper";
 
 const createUser = async (req: Request) => {
   const { password } = req.body;
@@ -45,7 +48,7 @@ const createUser = async (req: Request) => {
     }
   })
 
-  
+
 
   return result
 
@@ -152,6 +155,57 @@ const deleteUser = async (userId: string) => {
   });
 };
 
+const googleCallback = catchAsync(async (req: Request, res: Response) => {
+  let redirectTo = typeof req.query.state === "string" ? req.query.state : "";
+
+  if (redirectTo.startsWith("/")) {
+    redirectTo = redirectTo.slice(1);
+  }
+
+  const user = req.user as any;
+
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const accessToken = jwtHelper.generateToken(
+    {
+      userId: user.id,
+      email: user.email,
+      role: user.role
+    },
+    config.jwt.accessTokenSecret as string,
+    "10d"
+  );
+
+  const refreshToken = jwtHelper.generateToken(
+    {
+      userId: user.id,
+      email: user.email,
+      role: user.role
+    },
+    config.jwt.refreshTokenSecret as string,
+    "90d"
+  );
+
+  res.cookie("accessToken", accessToken, {
+    secure: true,
+    httpOnly: true,
+    sameSite: "none",
+    maxAge: 1000 * 60 * 60
+  })
+  res.cookie("refreshToken", refreshToken, {
+    secure: true,
+    httpOnly: true,
+    sameSite: "none",
+    maxAge: 1000 * 60 * 60 * 24 * 90
+  })
+
+  res.redirect(
+    `${config.frontend_url}/${redirectTo}?token=${accessToken}`
+  );
+});
 
 
 export const UserService = {
@@ -160,5 +214,6 @@ export const UserService = {
   findUserById,
   getSingleUser,
   userUpdateProfile,
-  deleteUser
+  deleteUser,
+  googleCallback
 };
