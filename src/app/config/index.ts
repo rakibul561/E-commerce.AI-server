@@ -64,6 +64,9 @@ export default {
     bcrypt: {
         saltRounds: process.env.BCRYPT_SALT || 10,
     },
+    openai: {
+        apiKey: process.env.OPENAI_API_KEY
+    }   
 
 
 }
