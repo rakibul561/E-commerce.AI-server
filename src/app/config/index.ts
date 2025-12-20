@@ -66,8 +66,7 @@ export default {
     },
     openai: {
         apiKey: process.env.OPENAI_API_KEY
-    }   
-
+    }  ,
     frontend_url: process.env.FRONTEND_URL
 
 
