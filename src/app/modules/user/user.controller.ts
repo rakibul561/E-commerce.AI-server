@@ -26,12 +26,12 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
 
 // New: Get current authenticated user
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
-    
-      const decodedUser = req.user as any;
 
-  const user = await UserService.getSingleUser(decodedUser.userId );
+    const decodedUser = req.user as any;
 
- 
+    const user = await UserService.getSingleUser(decodedUser.userId);
+
+
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -41,12 +41,12 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getFindUserById = catchAsync(async (req: Request, res: Response) => {
-    
-      const decodedUser = req.user as any;
 
-  const user = await UserService.findUserById(decodedUser.userId );
+    const decodedUser = req.user as any;
 
- 
+    const user = await UserService.findUserById(decodedUser.userId);
+
+
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -56,18 +56,18 @@ const getFindUserById = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-const userUpdateProfile = catchAsync(async(req: Request, res: Response) =>{
-     const decodedUser = req.user as any;;
-     const payload = req.body;
+const userUpdateProfile = catchAsync(async (req: Request, res: Response) => {
+    const decodedUser = req.user as any;;
+    const payload = req.body;
 
-   const result = await UserService.userUpdateProfile(decodedUser.userId, payload)
-  
-     sendResponse(res, {
-    success: true,
-    statusCode: 201,
-    message: "User profile updated successfully",
-    data:result
-  });
+    const result = await UserService.userUpdateProfile(decodedUser.userId, payload)
+
+    sendResponse(res, {
+        success: true,
+        statusCode: 201,
+        message: "User profile updated successfully",
+        data: result
+    });
 })
 
 
@@ -80,7 +80,8 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
         message: "User deleted successfully",
         data: user
     })
-}); 
+});
+
 
 
 
@@ -88,9 +89,9 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 export const UserController = {
     createUser,
     getAllUsers,
-   getSingleUser,
-   getFindUserById,
-   userUpdateProfile,
-   deleteUser
-   
+    getSingleUser,
+    getFindUserById,
+    userUpdateProfile,
+    deleteUser
+
 };

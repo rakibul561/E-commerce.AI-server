@@ -4,8 +4,24 @@ import { fileUpload } from "../../utils/fileUpload";
 import { userValidation } from "./user.validation";
 import auth from "../../middlewares/auth";
 import { Role as UserRole } from "@prisma/client";
+import passport from "passport";
+import { UserService } from "./user.service";
 
 const router = express.Router();
+
+router.get(
+    "/auth/google",
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+        prompt: "select_account"
+    })
+);
+
+router.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { session: false }),
+    UserService.googleCallback
+);
 
 // Existing routes
 router.post("/register",
@@ -22,13 +38,16 @@ router.patch("/profile", auth(UserRole.USER, UserRole.ADMIN), fileUpload.upload.
 router.get("/me", auth(UserRole.USER, UserRole.ADMIN), UserController.getSingleUser);
 
 // FIND USER BY ID (protected)
-router.get("/:id", auth( UserRole.ADMIN), UserController.getFindUserById);
+router.get("/:id", auth(UserRole.ADMIN), UserController.getFindUserById);
 
 // GET ALL USERS (protected)
 router.get("/", auth(UserRole.ADMIN), UserController.getAllUsers);
 
 // DELETE USER BY ID (protected)
 router.delete("/:id", auth(UserRole.ADMIN), UserController.deleteUser);
+
+
+
 
 
 

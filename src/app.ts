@@ -2,13 +2,15 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, { Application, Request, Response } from "express";
 import session from "express-session";
-import passport from "./app/config/passport.config";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
 import router from "./app/routes";
 import { PaymentController } from "./app/modules/payment/payemnt.controller";
 import config from "./app/config";
-import morgan from 'morgan'
+import morgan from 'morgan';
+import passport from "../src/app/config/passport"
+
+
 
 const app: Application = express();
 
@@ -30,24 +32,18 @@ app.use(cookieParser());
 
 app.use(morgan('combined'))
 
-// Session configuration (before passport)
+
 app.use(
     session({
-        secret: config.session.secret,
+        secret: config.google.clientSecret as string,
         resave: false,
         saveUninitialized: false,
-        cookie: {
-            maxAge: 24 * 60 * 60 * 1000, // 24 hours
-            httpOnly: true,
-            secure: config.node_env === 'production',
-            sameSite: config.node_env === 'production' ? 'none' : 'lax',
-        },
     })
 );
 
-// Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 app.get("/", (req: Request, res: Response) => {
     res.status(200).json({
