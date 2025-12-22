@@ -4,9 +4,9 @@ import { prisma } from "../prisma/prisma";
 
 export const checkCredits = (cost: number) => {
   return async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
-    
-  
-    
+
+
+
     if (!req.user) {
       return res.status(401).json({
         success: false,
@@ -16,7 +16,7 @@ export const checkCredits = (cost: number) => {
 
     // ✅ Different ways to get userId - try all possible fields
     const userId = req.user.userId || req.user.id || req.user._id;
-    
+
 
 
     if (!userId) {
@@ -44,7 +44,7 @@ export const checkCredits = (cost: number) => {
       if (user.credits < cost) {
         return res.status(403).json({
           success: false,
-          message: `Not enough credits. Required: ${cost}, Available: ${user.credits}`
+          message: `You’ve run out of credits. Please upgrade your subscription to continue. Required: ${cost}, Available: ${user.credits}`
         });
       }
 

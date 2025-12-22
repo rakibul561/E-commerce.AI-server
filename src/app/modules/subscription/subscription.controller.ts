@@ -21,7 +21,7 @@ const createCheckout = catchAsync(async (req: Request & { user?: any }, res: Res
   const { tier } = req.body;
 
   const data = await subscriptionService.createCheckoutSession(req.user.userId, tier);
-  console.log(data);
+
   sendResponse(res, {
     statusCode: 200,
     success: true,
