@@ -54,9 +54,6 @@ const createUser = async (req: Request) => {
 
 };
 
-// New: Find or create Google user
-
-// New: Find user by ID (for passport deserialize)
 const findUserById = async (id: string) => {
   try {
     const user = await prisma.user.findUnique({
@@ -93,7 +90,6 @@ const getAllUsers = async (query: Record<string, any>) => {
   };
 };
 
-// New: Get current authenticated user
 const getSingleUser = async (userId: string) => {
   return prisma.user.findUnique({
     where: { id: userId },

@@ -5,7 +5,6 @@ import sendResponse from '../../utils/sendResponse';
 import { subscriptionService } from './subscription.service';
 import { SUBSCRIPTION_PLANS } from '../../config/subscription.config';
 
-
 const getStatus = catchAsync(async (req: Request & { user?: any }, res: Response) => {
   const data = await subscriptionService.getSubscriptionStatus(req.user.userId);
 
@@ -21,7 +20,7 @@ const createCheckout = catchAsync(async (req: Request & { user?: any }, res: Res
   const { tier } = req.body;
 
   const data = await subscriptionService.createCheckoutSession(req.user.userId, tier);
-  console.log(data);
+
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -81,7 +80,6 @@ const getPlans = catchAsync(async (req: Request & { user?: any }, res: Response)
     data: { plans: SUBSCRIPTION_PLANS }
   })
 });
-
 
 export const SubscriptionController = {
   getStatus,
