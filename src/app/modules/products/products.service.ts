@@ -49,7 +49,6 @@ const createProduct = async (req: Request, userId: string) => {
 const generateProductText = async (req: Request, userId: string) => {
   const productId = req.params.id;
 
-  // ✅ Optional title from request body
   const { title } = req.body || {};
 
   const product = await prisma.product.findUnique({
@@ -60,10 +59,8 @@ const generateProductText = async (req: Request, userId: string) => {
     throw new ApiError(404, "Product not found");
   }
 
-  // 🔹 Use existing title or new title from request or let AI generate
   const titleToUse = title || product.title || undefined;
 
-  // 🔹 AI call with optional title
   const aiResult = await aiService.generateTextFromImage(
     product.originalImage,
     titleToUse
@@ -89,6 +86,7 @@ const generateProductText = async (req: Request, userId: string) => {
 
   return updatedProduct;
 };
+
 
 export const ProductService = {
   createProduct,
