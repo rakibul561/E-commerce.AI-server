@@ -27,9 +27,6 @@ class AIService {
     });
   }
 
-  /**
-   * Analyze product image and extract features
-   */
   async analyzeImage(imageUrl: string): Promise<ImageAnalysisResult> {
     try {
       const response = await this.client.post("/chat/completions", {
@@ -59,10 +56,6 @@ class AIService {
       throw new Error("Failed to analyze image");
     }
   }
-
-  /**
-   * Generate product content based on analysis
-   */
   async generateContent(
     analysis: ImageAnalysisResult,
     options?: AIGenerationOptions
@@ -104,9 +97,7 @@ class AIService {
     }
   }
 
-  /**
-   * Analyze user's writing style
-   */
+
   async analyzeWritingStyle(descriptions: string[]): Promise<string> {
     try {
       if (descriptions.length < 3) return "";
@@ -126,9 +117,6 @@ class AIService {
     }
   }
 
-  /**
-   * Generate complete product data
-   */
   async generateCompleteProduct(
     imageUrl: string,
     options?: AIGenerationOptions
@@ -139,9 +127,6 @@ class AIService {
     return { analysis, content };
   }
 
-  /**
-   * Safely parse JSON from AI
-   */
   private parseJSON<T>(content: string): T {
     const cleaned = content
       .replace(/```json/gi, "")
@@ -156,9 +141,6 @@ class AIService {
     }
   }
 
-  /**
-   * Health check
-   */
   async healthCheck(): Promise<boolean> {
     try {
       const res = await this.client.get("/models");

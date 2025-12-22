@@ -5,7 +5,7 @@ import { redisClient } from "../../config/redis.config";
 import { sendEmail } from "../../utils/emailSender";
 import { prisma } from "../../prisma/prisma";
 
-const OTP_EXPIRATION = 2 * 60; // 2 minutes in seconds
+const OTP_EXPIRATION = 2 * 60; 
 
 export const generateOtp = (length = 6) => {
     const otp = crypto.randomInt(10 ** (length - 1), 10 ** length).toString();
@@ -13,7 +13,6 @@ export const generateOtp = (length = 6) => {
 };
 
 const sendOTP = async (email: string, name: string) => {
-    // findOne নয়, findUnique ব্যবহার করতে হবে Prisma তে
     const user = await prisma.user.findUnique({
         where: {
             email: email

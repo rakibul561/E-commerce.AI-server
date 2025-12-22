@@ -24,7 +24,6 @@ const getAllUsers = catchAsync(async (req: Request, res: Response) => {
     })
 });
 
-// New: Get current authenticated user
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 
     const decodedUser = req.user as any;
@@ -55,7 +54,6 @@ const getFindUserById = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-
 const userUpdateProfile = catchAsync(async (req: Request, res: Response) => {
     const decodedUser = req.user as any;;
     const payload = req.body;
@@ -70,8 +68,6 @@ const userUpdateProfile = catchAsync(async (req: Request, res: Response) => {
     });
 })
 
-
-
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
     const user = await UserService.deleteUser(req.params.id);
     sendResponse(res, {
@@ -81,10 +77,6 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
         data: user
     })
 });
-
-
-
-
 
 export const UserController = {
     createUser,

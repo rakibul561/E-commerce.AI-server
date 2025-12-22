@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../prisma/prisma";
 
 export const checkCredits = (cost: number) => {
   return async (req: Request & { user?: any }, res: Response, next: NextFunction) => {
+    
 
 
 
@@ -13,14 +15,11 @@ export const checkCredits = (cost: number) => {
         message: "You are Unauthorized"
       });
     }
-
-    // ✅ Different ways to get userId - try all possible fields
     const userId = req.user.userId || req.user.id || req.user._id;
 
 
 
     if (!userId) {
-      console.error("❌ No userId found in req.user:", req.user);
       return res.status(401).json({
         success: false,
         message: "User ID not found in token"
@@ -32,7 +31,6 @@ export const checkCredits = (cost: number) => {
         where: { id: userId },
       });
 
-      console.log("✅ User from DB:", user ? "Found" : "Not Found"); // Debug
 
       if (!user) {
         return res.status(404).json({
@@ -50,7 +48,6 @@ export const checkCredits = (cost: number) => {
 
       next();
     } catch (error) {
-      console.error("❌ Error in checkCredits:", error);
       return res.status(500).json({
         success: false,
         message: "Internal server error"

@@ -5,7 +5,6 @@ import sendResponse from '../../utils/sendResponse';
 import { subscriptionService } from './subscription.service';
 import { SUBSCRIPTION_PLANS } from '../../config/subscription.config';
 
-
 const getStatus = catchAsync(async (req: Request & { user?: any }, res: Response) => {
   const data = await subscriptionService.getSubscriptionStatus(req.user.userId);
 
@@ -81,7 +80,6 @@ const getPlans = catchAsync(async (req: Request & { user?: any }, res: Response)
     data: { plans: SUBSCRIPTION_PLANS }
   })
 });
-
 
 export const SubscriptionController = {
   getStatus,

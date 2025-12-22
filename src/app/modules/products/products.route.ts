@@ -55,9 +55,6 @@ router.get(
   ProductController.searchProductVideos
 );
 
-
-
-
 router.delete(
   "/:productId",
   auth(Role.ADMIN, Role.USER),
