@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { z } from "zod";
 
@@ -15,6 +16,7 @@ import { fileUpload } from "../../utils/fileUpload";
 import { prisma } from "../../prisma/prisma";
 import { deductCredits } from "../../utils/creadit";
 import { aiService } from "../ai/ai.service";
+import { PrismaQueryBuilder } from "../../utils/QueryBuilder";
 
 const createProduct = async (req: Request, userId: string) => {
   if (!userId) {
@@ -88,7 +90,52 @@ const generateProductText = async (req: Request, userId: string) => {
 };
 
 
+const getProductById = async (id:string) =>{
+  console.log("the product id is ",id)
+   const result = await prisma.product.findUnique({
+    where : {
+      id: id
+    }
+   })
+   return result
+}
+
+const getAllProducts = async (query: Record<string, any>)  => {
+  const qb = new PrismaQueryBuilder(query)
+     .filter()
+    .search(["name", "email"])
+    .sort()
+    .fields()
+    .paginate();
+
+    const prismaQuery = qb.build();
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany(prismaQuery),
+      prisma.product.count({ where: prismaQuery.where }),
+    ]);
+  return {
+    meta:qb.getMeta(total),
+    data:products
+  };
+};
+
+
+const deleteProduct = async (productId: string) => {
+  const result = await prisma.product.delete({
+    where : {
+      id:productId
+    }
+  })
+
+  return result
+};
+
+
 export const ProductService = {
   createProduct,
-  generateProductText
+  generateProductText,
+  getAllProducts,
+  deleteProduct,
+  getProductById
 };

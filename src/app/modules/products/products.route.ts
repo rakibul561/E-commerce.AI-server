@@ -39,6 +39,16 @@ router.post(
   ProductController.generateProductText
 );
 
+router.get("/", auth(Role.ADMIN, Role.USER), ProductController.getAllProducts);
+
+router.get("/:id", auth(Role.ADMIN, Role.USER), ProductController.getProductById);
+
+router.delete(
+  "/:productId",
+  auth(Role.ADMIN, Role.USER),
+  ProductController.deleteProduct
+);
+
 
 
 export const ProductRoutes = router;
