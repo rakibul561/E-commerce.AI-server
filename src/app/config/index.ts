@@ -67,7 +67,13 @@ export default {
     openai: {
         apiKey: process.env.OPENAI_API_KEY
     }  ,
-    frontend_url: process.env.FRONTEND_URL
+    frontend_url: process.env.FRONTEND_URL,
+    aisearch : {
+        uniplash_api_key: process.env.UNIPLASH_API_KEY,
+        pexels_api_key: process.env.PEXELS_API_KEY,
+        pixabay_api_key: process.env.PIXABAY_API_KEY,
+        youtube_api_key: process.env.YOUTUBE_API_KEY
+    }
 
 
 }
