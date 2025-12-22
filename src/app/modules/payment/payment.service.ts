@@ -1,65 +1,211 @@
-
-import Stripe from "stripe";
-import { sendEmail } from "../../utils/emailSender";
-
-
-const handleStripeWebhooksEvent = async (event: Stripe.Event) => {
-
-    switch (event.type) {
-        case "checkout.session.completed": {
-            const session = event.data.object as Stripe.Checkout.Session;
-            const orderId = session.metadata?.orderId;
-
-            if (!orderId) break;
-
-            // ! update payment status 
-            await sendEmail({
-                to: session.customer_email as string,
-                subject: "Payment Successful 🎉",
-                html: `
-      <h2>Payment Confirmed</h2>
-      <p>Amount: $${session.amount_total as number / 100} USD</p>
-    `,
-            });
-
-            break;
-        }
-
-        case "payment_intent.succeeded": {
-            const paymentIntent = event.data.object as Stripe.PaymentIntent;
-            const orderId = paymentIntent.metadata?.orderId;
-
-            if (!orderId) break;
-
-            //    ! update payment stats and order status
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import Stripe from 'stripe';
+import { SubscriptionStatus } from '@prisma/client';
+import { SUBSCRIPTION_PLANS } from '../../config/subscription.config';
+import { CreditService } from '../credit/credit.service';
+import { stripe } from '../../utils/stripe';
+import { prisma } from '../../prisma/prisma';
 
 
-            break;
-        }
+const handleCheckoutCompleted = async (
+    session: Stripe.Checkout.Session
+): Promise<void> => {
+    const userId = session.metadata?.userId;
+    const tier = session.metadata?.tier as keyof typeof SUBSCRIPTION_PLANS;
 
-        case "charge.succeeded": {
-            const charge = event.data.object as Stripe.Charge;
-            const orderId = charge.metadata?.orderId;
+    if (!userId || !tier) return;
 
-            if (!orderId) break;
+    const customerId = session.customer as string;
+    const subscriptionId = session.subscription as string;
 
-            // await prisma.order.update({
-            //     where: { id: orderId },
-            //     data: {
-            //         paymentStatus: PaymentStatus.PAID,
-            //     },
-            // });
-            // console.log(`Order ${orderId} updated from charge.succeeded`);
-            break;
-        }
+    const stripeSubscription =
+        (await stripe.subscriptions.retrieve(
+            subscriptionId
+        )) as Stripe.Subscription;
 
-        default:
-            console.log(`Unhandled event type: ${event.type}`);
-    }
+    const plan = SUBSCRIPTION_PLANS[tier];
 
-    return { received: true };
+    const currentPeriodStart =
+        typeof stripeSubscription.current_period_start === 'number'
+            ? new Date(stripeSubscription.current_period_start * 1000)
+            : null;
+
+    const currentPeriodEnd =
+        typeof stripeSubscription.current_period_end === 'number'
+            ? new Date(stripeSubscription.current_period_end * 1000)
+            : null;
+
+    await prisma.subscription.upsert({
+        where: { userId },
+        create: {
+            userId,
+            tier,
+            status: 'ACTIVE',
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            stripePriceId: plan.priceId!,
+            currentPeriodStart,
+            currentPeriodEnd,
+            creditsPerMonth: plan.creditsPerMonth,
+        },
+        update: {
+            tier,
+            status: 'ACTIVE',
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            stripePriceId: plan.priceId!,
+            currentPeriodStart,
+            currentPeriodEnd,
+            cancelAtPeriodEnd: false,
+        },
+    });
+
+    // Initial credits (signup bonus / first month)
+    await CreditService.addCredits(userId, plan.credits);
+
+    console.log(`✅ Subscription created for user ${userId}`);
 };
 
+
+const handleSubscriptionUpdated = async (
+    subscription: Stripe.Subscription
+): Promise<void> => {
+    const customerId = subscription.customer as string;
+
+    const userSubscription = await prisma.subscription.findUnique({
+        where: { stripeCustomerId: customerId },
+    });
+
+    if (!userSubscription) return;
+
+    let status: SubscriptionStatus = 'ACTIVE';
+
+    if (subscription.status === 'canceled') status = 'CANCELLED';
+    if (subscription.status === 'past_due') status = 'PAST_DUE';
+    if (
+        subscription.status === 'unpaid' ||
+        subscription.status === 'incomplete'
+    ) {
+        status = 'INACTIVE';
+    }
+
+    const currentPeriodStart =
+        typeof subscription.current_period_start === 'number'
+            ? new Date(subscription.current_period_start * 1000)
+            : userSubscription.currentPeriodStart;
+
+    const currentPeriodEnd =
+        typeof subscription.current_period_end === 'number'
+            ? new Date(subscription.current_period_end * 1000)
+            : userSubscription.currentPeriodEnd;
+
+    await prisma.subscription.update({
+        where: { id: userSubscription.id },
+        data: {
+            status,
+            currentPeriodStart,
+            currentPeriodEnd,
+            cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        },
+    });
+
+    console.log(`🔄 Subscription updated for user ${userSubscription.userId}`);
+};
+
+
+const handleSubscriptionDeleted = async (
+    subscription: Stripe.Subscription
+): Promise<void> => {
+    const customerId = subscription.customer as string;
+
+    const userSubscription = await prisma.subscription.findUnique({
+        where: { stripeCustomerId: customerId },
+    });
+
+    if (!userSubscription) return;
+
+    await prisma.subscription.update({
+        where: { id: userSubscription.id },
+        data: {
+            status: 'CANCELLED',
+            tier: 'FREE',
+            creditsPerMonth: SUBSCRIPTION_PLANS.FREE.creditsPerMonth,
+        },
+    });
+
+    console.log(`❌ Subscription cancelled for user ${userSubscription.userId}`);
+};
+
+
+const handleInvoicePaymentSucceeded = async (
+    invoice: Stripe.Invoice
+): Promise<void> => {
+    const customerId = invoice.customer as string;
+
+    const userSubscription = await prisma.subscription.findUnique({
+        where: { stripeCustomerId: customerId },
+    });
+
+    if (!userSubscription) return;
+
+    const line = invoice.lines.data[0];
+
+    const currentPeriodStart =
+        typeof line?.period?.start === 'number'
+            ? new Date(line.period.start * 1000)
+            : userSubscription.currentPeriodStart;
+
+    const currentPeriodEnd =
+        typeof line?.period?.end === 'number'
+            ? new Date(line.period.end * 1000)
+            : userSubscription.currentPeriodEnd;
+
+    await prisma.subscription.update({
+        where: { id: userSubscription.id },
+        data: {
+            currentPeriodStart,
+            currentPeriodEnd,
+            status: 'ACTIVE',
+        },
+    });
+
+    const plan = SUBSCRIPTION_PLANS[userSubscription.tier];
+
+    await CreditService.addCredits(
+        userSubscription.userId,
+        plan.creditsPerMonth
+    );
+
+    console.log(
+        `💳 Invoice paid → period updated & ${plan.creditsPerMonth} credits added`
+    );
+};
+
+
+const handleInvoicePaymentFailed = async (
+    invoice: Stripe.Invoice
+): Promise<void> => {
+    const customerId = invoice.customer as string;
+
+    const userSubscription = await prisma.subscription.findUnique({
+        where: { stripeCustomerId: customerId },
+    });
+
+    if (!userSubscription) return;
+
+    await prisma.subscription.update({
+        where: { id: userSubscription.id },
+        data: { status: 'PAST_DUE' },
+    });
+
+    console.log(`⚠️ Payment failed for user ${userSubscription.userId}`);
+};
+
+
 export const PaymentService = {
-    handleStripeWebhooksEvent
+    handleCheckoutCompleted,
+    handleSubscriptionUpdated,
+    handleSubscriptionDeleted,
+    handleInvoicePaymentSucceeded,
+    handleInvoicePaymentFailed,
 };

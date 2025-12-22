@@ -31,7 +31,10 @@ export default {
     stripe: {
         stripeSecretKey: process.env.STRIPE_SECRET_KEY,
         stripeWebHookSecret: process.env.STRIPE_WEBHOOKS_SECRET,
-        frontendUrl: process.env.FRONTEND_URL
+        frontendUrl: process.env.FRONTEND_URL,
+        basicPlan: process.env.STRIPE_BASIC_PRICE_ID,
+        proPlan: process.env.STRIPE_PRO_PRICE_ID,
+        enterprisePlan: process.env.STRIPE_ENTERPRISE_PRICE_ID
     },
 
     username: process.env.REDIS_USERNAME,
@@ -66,9 +69,9 @@ export default {
     },
     openai: {
         apiKey: process.env.OPENAI_API_KEY
-    }  ,
+    },
     frontend_url: process.env.FRONTEND_URL,
-    aisearch : {
+    aisearch: {
         uniplash_api_key: process.env.UNIPLASH_API_KEY,
         pexels_api_key: process.env.PEXELS_API_KEY,
         pixabay_api_key: process.env.PIXABAY_API_KEY,

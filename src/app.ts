@@ -5,10 +5,11 @@ import session from "express-session";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import notFound from "./app/middlewares/notFound";
 import router from "./app/routes";
-import { PaymentController } from "./app/modules/payment/payemnt.controller";
+
 import config from "./app/config";
 import morgan from 'morgan';
 import passport from "../src/app/config/passport"
+import { paymentController } from "./app/modules/payment/payemnt.controller";
 
 
 
@@ -18,8 +19,9 @@ const app: Application = express();
 app.post(
     "/webhook",
     express.raw({ type: "application/json" }),
-    PaymentController.handleStripeWebhooksEvent
+    paymentController.handleStripeWebhook
 );
+
 
 app.use(cors({
     origin: ["http://localhost:3000", "http://localhost:5173"],
