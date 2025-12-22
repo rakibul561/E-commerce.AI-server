@@ -43,6 +43,21 @@ router.get("/", auth(Role.ADMIN, Role.USER), ProductController.getAllProducts);
 
 router.get("/:id", auth(Role.ADMIN, Role.USER), ProductController.getProductById);
 
+router.get(
+  "/search/images",
+  auth(Role.ADMIN, Role.USER),
+  ProductController.searchProductImages
+);
+
+router.get(
+  "/search/videos",
+  auth(Role.ADMIN, Role.USER),
+  ProductController.searchProductVideos
+);
+
+
+
+
 router.delete(
   "/:productId",
   auth(Role.ADMIN, Role.USER),
