@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import crypto from "crypto";
-import prisma from "../../prisma/prisma";
 import ApiError from "../../errors/apiError";
 import { redisClient } from "../../config/redis.config";
 import { sendEmail } from "../../utils/emailSender";
+import { prisma } from "../../prisma/prisma";
 
 const OTP_EXPIRATION = 2 * 60; // 2 minutes in seconds
 

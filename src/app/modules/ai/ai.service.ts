@@ -1,89 +1,173 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import axios from "axios";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/modules/ai/ai.service.ts
+
+import axios, { AxiosInstance, AxiosError } from "axios";
 import config from "../../config";
+import AI_PROMPTS from "./ai.prompts";
+import {
+  ImageAnalysisResult,
+  ProductContent,
+  AIGenerationOptions,
+  CompleteProductData
+} from "./ai.types";
 
-const openRouterClient = axios.create({
-  baseURL: "https://openrouter.ai/api/v1",
-  headers: {
-    Authorization: `Bearer ${config.openai.apiKey}`,
-    "Content-Type": "application/json",
-    "HTTP-Referer": "http://localhost:5000",
-    "X-Title": "Ecommerce AI Backend"
+class AIService {
+  private client: AxiosInstance;
+
+  constructor() {
+    this.client = axios.create({
+      baseURL: "https://openrouter.ai/api/v1",
+      headers: {
+        Authorization: `Bearer ${config.openai.apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": config.frontend_url,
+        "X-Title": "Ecommerce AI Backend"
+      }
+    });
   }
-});
 
-const generateTextFromImage = async (imageUrl: string, userTitle?: string) => {
-  // ✅ Title optional করা হলো
-  const titleInstruction = userTitle 
-    ? `Use this title: "${userTitle}"` 
-    : "Generate a short, catchy title";
-
-  const prompt = `
-You are an ecommerce product content generator.
-
-Analyze the given product image and generate the following fields:
-
-- title (${titleInstruction})
-- description (2–3 sentences, marketing focused, based on the actual product in the image)
-- category (single category name based on what you see in the image)
-- tags (5–8 short tags as array, relevant to the product)
-- keywords (SEO keywords as array, based on the product type)
-- seoTitle (max 60 characters)
-- seoDescription (max 160 characters)
-- seoKeywords (SEO keyword list)
-
-Rules:
-- Analyze the ACTUAL product shown in the image
-- Return ONLY valid JSON
-- Do NOT use markdown
-- Do NOT wrap with backticks
-- Do NOT add explanations
-- Do NOT return empty keys
-- Be specific about what you see in the image (clothing, electronics, food, etc.)
-`;
-
-  // ✅ FIX: Proper vision API format
-  const res = await openRouterClient.post("/chat/completions", {
-    model: "openai/gpt-4o-mini", // Vision supported model
-    messages: [
-      {
-        role: "user",
-        content: [
+  /**
+   * Analyze product image and extract features
+   */
+  async analyzeImage(imageUrl: string): Promise<ImageAnalysisResult> {
+    try {
+      const response = await this.client.post("/chat/completions", {
+        model: "openai/gpt-4o-mini",
+        messages: [
           {
-            type: "text",
-            text: prompt
+            role: "user",
+            content: [
+              { type: "text", text: AI_PROMPTS.IMAGE_ANALYSIS },
+              {
+                type: "image_url",
+                image_url: { url: imageUrl }
+              }
+            ]
+          }
+        ],
+        temperature: 0.3
+      });
+
+      const content = response.data?.choices?.[0]?.message?.content;
+      if (!content) throw new Error("Empty AI response");
+
+      return this.parseJSON<ImageAnalysisResult>(content);
+    } catch (error) {
+      const err = error as AxiosError;
+      console.error("❌ Image Analysis Error:", err.message);
+      throw new Error("Failed to analyze image");
+    }
+  }
+
+  /**
+   * Generate product content based on analysis
+   */
+  async generateContent(
+    analysis: ImageAnalysisResult,
+    options?: AIGenerationOptions
+  ): Promise<ProductContent> {
+    try {
+      const prompt = AI_PROMPTS.PRODUCT_CONTENT(
+        options?.userTitle,
+        options?.userStyle
+      );
+
+      const response = await this.client.post("/chat/completions", {
+        model: "openai/gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert e-commerce copywriter. Always return valid JSON only."
           },
           {
-            type: "image_url",
-            image_url: {
-              url: imageUrl
-            }
+            role: "user",
+            content: `${prompt}\n\nProduct Analysis:\n${JSON.stringify(
+              analysis,
+              null,
+              2
+            )}`
           }
-        ]
-      }
-    ]
-  });
+        ],
+        temperature: 0.7
+      });
 
-  const content = res.data?.choices?.[0]?.message?.content;
+      const content = response.data?.choices?.[0]?.message?.content;
+      if (!content) throw new Error("Empty AI response");
 
-  if (!content) {
-    throw new Error("AI response is empty");
+      return this.parseJSON<ProductContent>(content);
+    } catch (error) {
+      const err = error as AxiosError;
+      console.error("❌ Content Generation Error:", err.message);
+      throw new Error("Failed to generate product content");
+    }
   }
 
-  // ✅ JSON sanitize + safe parse
-  const cleaned = content
-    .replace(/```json/gi, "")
-    .replace(/```/g, "")
-    .trim();
+  /**
+   * Analyze user's writing style
+   */
+  async analyzeWritingStyle(descriptions: string[]): Promise<string> {
+    try {
+      if (descriptions.length < 3) return "";
 
-  try {
-    return JSON.parse(cleaned);
-  } catch (err) {
-    console.error("❌ AI RAW RESPONSE:", content);
-    throw new Error("AI returned invalid JSON");
+      const samples = descriptions.slice(0, 5).join("\n\n---\n\n");
+
+      const response = await this.client.post("/chat/completions", {
+        model: "openai/gpt-4o-mini",
+        messages: [{ role: "user", content: AI_PROMPTS.STYLE_ANALYSIS(samples) }],
+        temperature: 0.3
+      });
+
+      return response.data?.choices?.[0]?.message?.content ?? "";
+    } catch (error) {
+      console.warn("⚠️ Style analysis failed");
+      return "";
+    }
   }
-};
 
-export const aiService = {
-  generateTextFromImage
-};
+  /**
+   * Generate complete product data
+   */
+  async generateCompleteProduct(
+    imageUrl: string,
+    options?: AIGenerationOptions
+  ): Promise<Omit<CompleteProductData, "images" | "videos">> {
+    const analysis = await this.analyzeImage(imageUrl);
+    const content = await this.generateContent(analysis, options);
+
+    return { analysis, content };
+  }
+
+  /**
+   * Safely parse JSON from AI
+   */
+  private parseJSON<T>(content: string): T {
+    const cleaned = content
+      .replace(/```json/gi, "")
+      .replace(/```/g, "")
+      .trim();
+
+    try {
+      return JSON.parse(cleaned);
+    } catch {
+      console.error("❌ Invalid JSON from AI:", content);
+      throw new Error("AI returned invalid JSON");
+    }
+  }
+
+  /**
+   * Health check
+   */
+  async healthCheck(): Promise<boolean> {
+    try {
+      const res = await this.client.get("/models");
+      return res.status === 200;
+    } catch (error) {
+      console.error("❌ AI Health Check Failed");
+      return false;
+    }
+  }
+}
+
+export default new AIService();
