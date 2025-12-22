@@ -1,13 +1,11 @@
-import { PrismaClient, SubscriptionTier } from '@prisma/client';
+import { SubscriptionTier } from '@prisma/client';
 import { SUBSCRIPTION_PLANS } from '../../config/subscription.config';
 import ApiError from '../../errors/apiError';
 import { stripe } from '../../utils/stripe';
+import { prisma } from '../../prisma/prisma';
 
-const prisma = new PrismaClient();
 
 const getSubscriptionStatus = async (userId: string) => {
-
-  console.log("userid ", userId);
 
   const subscription = await prisma.subscription.findUnique({ where: { userId } });
   const user = await prisma.user.findUnique({

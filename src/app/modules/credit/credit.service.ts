@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { CREDIT_COSTS, CreditAction } from '../../config/subscription.config';
 import ApiError from '../../errors/apiError';
+import { prisma } from '../../prisma/prisma';
 
 
-const prisma = new PrismaClient();
 
 const hasCredits = async (userId: string, action: CreditAction) => {
   const user = await prisma.user.findUnique({
