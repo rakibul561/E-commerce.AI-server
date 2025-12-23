@@ -7,7 +7,6 @@ import httpStatus from "http-status"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-    console.log("server error", err);
 
     let statusCode: number = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
     const success = false;

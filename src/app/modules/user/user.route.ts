@@ -47,7 +47,18 @@ router.post("/register",
     }
 );
 
-router.patch("/profile", auth(UserRole.USER, UserRole.ADMIN), fileUpload.upload.single("file"), UserController.userUpdateProfile);
+router.patch(
+  "/profile",
+  auth(UserRole.USER, UserRole.ADMIN),
+  fileUpload.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = userValidation.updateUserValidationSchema.parse(
+      JSON.parse(req.body.data)
+    );
+    return UserController.userUpdateProfile(req, res, next);
+  }
+);
+
 
 // Get current user (protected)
 router.get("/me", auth(UserRole.USER, UserRole.ADMIN), UserController.getSingleUser);

@@ -36,7 +36,8 @@ model User {
   id             String       @id @default(auto()) @map("_id") @db.ObjectId
   email          String       @unique
   password       String?
-  name           String?
+  firstName      String
+  lastName       String
   profilePicture String?
   role           Role         @default(USER)
   isVerified     Boolean      @default(false)

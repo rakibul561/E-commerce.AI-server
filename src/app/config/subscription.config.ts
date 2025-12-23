@@ -30,7 +30,7 @@ export const SUBSCRIPTION_PLANS: Record<
     },
 
     BASIC: {
-        priceId: config.stripe.basicPlan as string, // price_xxx (from Stripe)
+        priceId: config.stripe.basicPlan as string, 
         credits: 100,
         creditsPerMonth: 100,
         name: 'Basic Plan',
@@ -45,7 +45,7 @@ export const SUBSCRIPTION_PLANS: Record<
     },
 
     PRO: {
-        priceId: config.stripe.proPlan as string, // price_xxx
+        priceId: config.stripe.proPlan as string, 
         credits: 500,
         creditsPerMonth: 500,
         name: 'Pro Plan',
@@ -61,7 +61,7 @@ export const SUBSCRIPTION_PLANS: Record<
     },
 
     ENTERPRISE: {
-        priceId: config.stripe.enterprisePlan as string, // price_xxx
+        priceId: config.stripe.enterprisePlan as string, 
         credits: 2000,
         creditsPerMonth: 2000,
         name: 'Enterprise Plan',

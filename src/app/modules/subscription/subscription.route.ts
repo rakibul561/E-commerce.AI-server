@@ -25,13 +25,11 @@ router.post(
     SubscriptionController.reactivate
 );
 
-
 router.post(
     '/change-plan',
     auth(Role.USER, Role.ADMIN),
     SubscriptionController.changePlan
 );
-
 
 router.post(
     '/billing-portal',

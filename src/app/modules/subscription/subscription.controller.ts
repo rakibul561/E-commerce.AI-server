@@ -4,7 +4,6 @@ import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { subscriptionService } from './subscription.service';
 
-
 const getStatus = catchAsync(async (req: Request & { user?: any }, res: Response) => {
   const data = await subscriptionService.getSubscriptionStatus(req.user.userId);
 
