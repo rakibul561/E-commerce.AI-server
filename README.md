@@ -1,214 +1,269 @@
-# 📦 Node.js + Express + TypeScript — Modular Backend Starter Pack
+# 🚀 AI-Powered Product Content Generator — Backend
 
-A **fully scalable, production-ready backend starter template** built with **Node.js**, **Express**, and **TypeScript**, following a **clean modular architecture** and real-world industry practices.
+A **scalable, production-grade backend system** built with **Node.js, Express.js, TypeScript, Prisma, and MongoDB**, designed to power an **AI-driven product content automation platform**.
 
-This project is designed to serve as a **solid foundation** for small to large-scale backend systems, including authentication, payments, real-time features, security, and third-party integrations.
-
----
-
-## 🚀 Key Features
-
-### 🧱 Core Architecture
-
-* ⚡ **TypeScript-first setup**
-* 📁 **Modular folder structure**
-
-  * Controller
-  * Service
-  * Route
-  * Validation
-  * Middleware
-* 🧩 **Reusable utilities**
-
-  * `catchAsync`
-  * `sendResponse`
-  * Global error handler
-* 🌐 **Express server** with CORS support
-* 🛠️ **Environment-based configuration**
-* 📦 **Production-ready build setup**
+This backend handles **AI content generation, media processing, subscriptions & credits, secure authentication, exports, and admin analytics**, following clean architecture and industry best practices.
 
 ---
 
-### 🔐 Authentication & Authorization
+## 🧠 Core Responsibilities
 
-* ✅ Login & Logout system
-* 🔑 **Passport.js authentication**
-
-  * Google OAuth login
-* 🔐 **OTP based verification**
-* 🔄 **Reset password flow**
-* 🍪 Cookie & token based auth support
-
----
-
-### 💳 Payment Systems
-
-* 💰 **Stripe payment integration**
-* 🇧🇩 **SSLCommerz payment gateway**
-* 🇧🇩 **amarpay payment gateway**
-* 🔔 **Webhook handling** for payment verification
-* 📜 Secure transaction lifecycle handling
+* AI-powered product content generation
+* Image & video processing pipelines
+* Subscription & credit-based usage management
+* Secure authentication & authorization
+* Admin monitoring & analytics
+* Cloud storage & export integrations
 
 ---
 
-### 📤 File & Media Handling
+## 📮 API Documentation
 
-* ☁️ **File upload using Multer**
-* 🌩️ **Cloudinary integration** for media storage
-* 🖼️ Image & file upload with validation
-
----
-
-
-### 📡 Real-Time Features
-
-* 🔌 **Socket.IO implementation**
-* 🔁 Real-time data communication
-* 📣 Event-based client ↔ server messaging
+📌 **Postman Collection:**
+[https://documenter.getpostman.com/view/46499415/2sBXVZnDio](https://documenter.getpostman.com/view/46499415/2sBXVZnDio)
 
 ---
 
-### 📧 Email & Notifications
+## 🧩 Tech Stack
 
-* ✉️ **Email sending with Nodemailer**
-* 📩 OTP, payment confirmation & system emails
-* 🔐 Secure email configuration via environment variables
+### Backend
+
+* **Node.js**
+* **Express.js**
+* **TypeScript**
+
+### Database
+
+* **MongoDB**
+* **Prisma ORM**
+
+### AI & Media
+
+* **OpenAI** (text generation)
+* Computer Vision API (image analysis)
+* AI Image Generation
+* AI Video Synthesis
+
+### Payments
+
+* **Stripe Subscriptions**
+* Credit-based usage enforcement
+
+### Storage
+
+* **Cloudinary**
+
+### Authentication & Security
+
+* JWT Authentication (Access & Refresh Tokens)
+* Role-based Access Control (User / Admin)
+* Rate Limiting
+* Helmet & CORS
 
 ---
 
-### ⚙️ Performance & Security
+## ✨ Feature Overview
 
-* 🚦 **Rate limiting** for API protection
-* 🛡️ Secure headers & middleware support
-* 📊 Optimized request handling
+### 🔹 Core AI Capabilities
+
+* Generate **product titles, descriptions, and SEO tags** from a single image
+* Detect **product category & type** using computer vision
+* Learn and replicate **user-specific writing styles**
+* Smart **keyword & tag generation**
+
+### 🖼️ AI Image & Video
+
+* Search & fetch **copyright-free product images**
+* AI image generation fallback
+* YouTube product video search & preview
+* AI-generated short product videos (2–3 minutes)
+
+### 📦 Data Management
+
+* Export product data compatible with **Shopify & WooCommerce**
+* Secure cloud storage for generated content
+
+### 👤 User & Subscription
+
+* User dashboard with generation history
+* Credit & subscription tracking
+* Stripe plans: **Basic / Pro / Enterprise**
+* Credit-based AI usage limits
+
+### 🛠️ Admin & Analytics
+
+* Admin dashboard
+* User & subscription management
+* AI usage & system analytics
 
 ---
 
-### 🔎 Query & Data Handling
+## 🔐 Test Credentials (Development Only)
 
-* 🧠 **Advanced query builder**
+> ⚠️ **For testing purposes only**
 
-  * Filtering
-  * Sorting
-  * Pagination
-  * Searching
-* 📚 Clean service-layer database logic
+**User**
+
+```json
+{
+  "email": "nayeem2@gmail.com",
+  "password": "Nayeem123$"
+}
+```
+
+**Admin**
+
+```json
+{
+  "email": "admin@gmail.com",
+  "password": "admin123$"
+}
+```
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```
 src/
-│── app/
-│   ├── modules/
-│   │   ├── auth/
-│   │   ├── user/
-│   │   ├── payment/
-│   │   └── upload/
-│   ├── middlewares/
-│   ├── utils/
-│   ├── config/
-│   └── routes/
 │
-│── server.ts
-│── app.ts
+├── app.ts
+├── server.ts
 │
-prisma/
-.env
-package.json
-tsconfig.json
+├── modules/
+│   ├── auth/
+│   ├── user/
+│   ├── ai/
+│   ├── product/
+│   ├── subscription/
+│   ├── payment/
+│   ├── export/
+│   ├── admin/
+│
+├── utils/
+│   ├── catchAsync.ts
+│   ├── sendResponse.ts
+│   ├── cloudStorage.ts
+│
+├── middlewares/
+│   ├── auth.ts
+│   ├── rateLimiter.ts
+│
+├── config/
+│   ├── index.ts
+│
+└── routes/
 ```
 
 ---
 
-## 🛠️ Installation & Setup
+## ⚙️ Installation & Setup
 
-### 1️⃣ Clone the repository
+### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/nayeem-miah/Backend-api.git
-cd Backend-api
+git clone https://github.com/rakibul561/E-commerce.AI-server.git
+cd E-commerce.AI-server
 ```
 
----
-
-### 2️⃣ Install dependencies
+### 2️⃣ Install Dependencies
 
 ```bash
 npm install
 ```
 
----
+### 3️⃣ Environment Configuration
 
-### 3️⃣ Configure environment variables
-
-Create a `.env` file in the root directory:
+Create a `.env` file (see `.env.example`):
 
 ```env
 PORT=5000
-NODE_ENV=development
+DATABASE_URL=
 
-DATABASE_URL=your_database_url
+# JWT
+JWT_ACCESS_SECRET=
+JWT_REFRESH_SECRET=
 
-# Auth
-JWT_SECRET=your_secret
-
-# Google OAuth
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-
-# Cloudinary
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-
-# Email
-EMAIL_USER=
-EMAIL_PASS=
+# AI
+OPENAI_API_KEY=
 
 # Stripe
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
 
-# SSLCommerz
-SSL_STORE_ID=
-SSL_STORE_PASS=
-SSL_PAYMENT_API=
-SSL_VALIDATION_API=
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
----
-
-### 4️⃣ Start development server
+### 4️⃣ Run Development Server
 
 ```bash
 npm run dev
 ```
 
----
-
-### 5️⃣ Build for production
+### 5️⃣ Build for Production
 
 ```bash
 npm run build
-```
-
----
-
-### 6️⃣ Start production server
-
-```bash
 npm start
 ```
 
 ---
 
-## ✅ Use Cases
+## 🔐 Authentication Flow
 
-* SaaS applications
-* E-commerce backend
-* Payment-based platforms
-* Real-time systems
-* Scalable REST APIs
+* JWT-based authentication
+* Access & Refresh tokens
+* Role-based authorization (User / Admin)
+
+---
+
+## 💳 Subscription & Credit Logic
+
+* Each subscription has monthly credit limits
+* AI operations consume credits
+* Requests are blocked when credits are exhausted
+* Stripe webhooks handle:
+
+  * Renewals
+  * Upgrades / downgrades
+  * Cancellations
+
+---
+
+## 📤 Export Support
+
+* JSON & CSV formats
+* Shopify & WooCommerce compatible exports
+
+---
+
+## 📊 Admin Capabilities
+
+* View and manage users
+* Monitor AI usage
+* Track subscriptions & revenue
+* Moderate platform content
+
+---
+
+## 🧪 API Documentation
+
+* Postman Collection (included)
+* Swagger support (optional / extensible)
+
+---
+
+## 🚀 Future Roadmap
+
+* Team-based workspaces
+* Multi-language AI generation
+* AI A/B testing
+* Webhook-based automation
+* Advanced analytics & reporting
+
+---
+
 
