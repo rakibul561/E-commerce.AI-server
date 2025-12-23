@@ -3,6 +3,7 @@ import { SUBSCRIPTION_PLANS } from '../../config/subscription.config';
 import ApiError from '../../errors/apiError';
 import { stripe } from '../../utils/stripe';
 import { prisma } from '../../prisma/prisma';
+import config from '../../config';
 
 
 const getSubscriptionStatus = async (userId: string) => {
@@ -177,6 +178,82 @@ const changePlan = async (
   });
 };
 
+const seedSubscriptionPlans = async () => {
+  await prisma.subscriptionPlan.createMany({
+    data: [
+      {
+        tier: 'FREE',
+        name: 'Free Plan',
+        price: 0,
+        priceId: null,
+        credits: 20,
+        creditsPerMonth: 10,
+        features: [
+          '20 initial credits',
+          '10 credits per month',
+          'Basic AI generation',
+          'Limited exports',
+        ],
+      },
+      {
+        tier: 'BASIC',
+        name: 'Basic Plan',
+        price: 99,
+        priceId: config.stripe.basicPlan as string,
+        credits: 100,
+        creditsPerMonth: 100,
+        features: [
+          '100 credits per month',
+          'AI-powered product generation',
+          'Image search & generation',
+          'Basic video search',
+          'Shopify & WooCommerce export',
+        ],
+      },
+      {
+        tier: 'PRO',
+        name: 'Pro Plan',
+        price: 299,
+        priceId: config.stripe.proPlan as string,
+        credits: 500,
+        creditsPerMonth: 500,
+        features: [
+          '500 credits per month',
+          'Advanced AI generation',
+          'AI writing style adaptation',
+          'AI video creation',
+          'Priority support',
+          'Unlimited exports',
+        ],
+      },
+      {
+        tier: 'ENTERPRISE',
+        name: 'Enterprise Plan',
+        price: 499,
+        priceId: config.stripe.enterprisePlan as string,
+        credits: 2000,
+        creditsPerMonth: 2000,
+        features: [
+          '2000 credits per month',
+          'All Pro features',
+          'Custom AI training',
+          'Dedicated account manager',
+          'API access',
+          'White-label support',
+        ],
+      },
+    ],
+  });
+
+  return true;
+};
+
+const getPlans = async () => {
+  return await prisma.subscriptionPlan.findMany();
+}
+
+
+
 
 export const subscriptionService = {
   getSubscriptionStatus,
@@ -184,5 +261,7 @@ export const subscriptionService = {
   createBillingPortalSession,
   cancelSubscription,
   reactivateSubscription,
-  changePlan
+  changePlan,
+  seedSubscriptionPlans,
+  getPlans
 };

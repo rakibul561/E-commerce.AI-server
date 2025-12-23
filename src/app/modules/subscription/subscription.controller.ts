@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import catchAsync from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { subscriptionService } from './subscription.service';
-import { SUBSCRIPTION_PLANS } from '../../config/subscription.config';
 
 const getStatus = catchAsync(async (req: Request & { user?: any }, res: Response) => {
   const data = await subscriptionService.getSubscriptionStatus(req.user.userId);
@@ -73,12 +72,24 @@ const billingPortal = catchAsync(async (req: Request & { user?: any }, res: Resp
 });
 
 const getPlans = catchAsync(async (req: Request & { user?: any }, res: Response) => {
+  const result = await subscriptionService.getPlans();
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: "Plans retrieved successfully",
-    data: { plans: SUBSCRIPTION_PLANS }
+    data: result
   })
+});
+
+
+const seedPlans = catchAsync(async (_req: Request, res: Response) => {
+  await subscriptionService.seedSubscriptionPlans();
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Subscription plans seeded successfully',
+  });
 });
 
 export const SubscriptionController = {
@@ -88,7 +99,8 @@ export const SubscriptionController = {
   reactivate,
   changePlan,
   billingPortal,
-  getPlans
+  getPlans,
+  seedPlans
 };
 
 

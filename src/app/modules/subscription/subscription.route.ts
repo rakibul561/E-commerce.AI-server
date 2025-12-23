@@ -37,10 +37,18 @@ router.post(
     SubscriptionController.billingPortal
 );
 
-router.post("/cancel",
+router.post(
+    '/cancel',
     auth(Role.USER, Role.ADMIN),
     SubscriptionController.cancel
-)
+);
+
+
+router.post(
+    '/seed',
+    auth(Role.ADMIN),
+    SubscriptionController.seedPlans
+);
 
 export const SubscriptionRoutes = router;
 

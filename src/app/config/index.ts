@@ -76,7 +76,15 @@ export default {
         pexels_api_key: process.env.PEXELS_API_KEY,
         pixabay_api_key: process.env.PIXABAY_API_KEY,
         youtube_api_key: process.env.YOUTUBE_API_KEY
-    }
+    },
+
+    // facebook 
+    facebook: {
+        clientId: process.env.FACEBOOK_CLIENT_ID,
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+        callbackURL: process.env.FACEBOOK_CALLBACK_URL
+    },
+
 
 
 }
