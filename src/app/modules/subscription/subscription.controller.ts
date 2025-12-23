@@ -82,6 +82,7 @@ const getPlans = catchAsync(async (req: Request & { user?: any }, res: Response)
   })
 });
 
+
 const seedPlans = catchAsync(async (_req: Request, res: Response) => {
   await subscriptionService.seedSubscriptionPlans();
 
