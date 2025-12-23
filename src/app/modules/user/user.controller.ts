@@ -55,18 +55,20 @@ const getFindUserById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const userUpdateProfile = catchAsync(async (req: Request, res: Response) => {
-    const decodedUser = req.user as any;;
-    const payload = req.body;
+  const decodedUser = req.user as any;
 
-    const result = await UserService.userUpdateProfile(decodedUser.userId, payload)
+  const result = await UserService.userUpdateProfile(
+    decodedUser.userId,
+    req.body
+  );
 
-    sendResponse(res, {
-        success: true,
-        statusCode: 201,
-        message: "User profile updated successfully",
-        data: result
-    });
-})
+  sendResponse(res, {
+    success: true,
+    statusCode: 201,
+    message: "User profile updated successfully",
+    data: result,
+  });
+});
 
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
     const user = await UserService.deleteUser(req.params.id);
