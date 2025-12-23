@@ -92,6 +92,29 @@ const seedPlans = catchAsync(async (_req: Request, res: Response) => {
   });
 });
 
+const updatePlans = catchAsync(async (req: Request, res: Response) => {
+
+  await subscriptionService.updatePlans(req.params.id, req.body);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Subscription plans updated successfully',
+  });
+});
+
+
+const deletePlan = catchAsync(async (req: Request, res: Response) => {
+
+  await subscriptionService.deletePlan(req.params.id);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Subscription plan deleted successfully',
+  });
+})
+
 export const SubscriptionController = {
   getStatus,
   createCheckout,
@@ -100,7 +123,10 @@ export const SubscriptionController = {
   changePlan,
   billingPortal,
   getPlans,
-  seedPlans
+  seedPlans,
+  updatePlans,
+  deletePlan
+
 };
 
 
