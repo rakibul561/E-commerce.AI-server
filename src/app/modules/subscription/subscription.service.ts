@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SubscriptionTier } from '@prisma/client';
 import { SUBSCRIPTION_PLANS } from '../../config/subscription.config';
 import ApiError from '../../errors/apiError';
@@ -252,7 +253,25 @@ const getPlans = async () => {
   return await prisma.subscriptionPlan.findMany();
 }
 
+const updatePlans = async (id: string, payload: any) => {
 
+  const result = await prisma.subscriptionPlan.update({
+    where: { id },
+    data: payload
+  })
+
+  return result
+};
+
+
+const deletePlan = async (id: string) => {
+
+  const result = await prisma.subscriptionPlan.delete({
+    where: { id }
+  })
+
+  return result
+}
 
 
 export const subscriptionService = {
@@ -263,5 +282,7 @@ export const subscriptionService = {
   reactivateSubscription,
   changePlan,
   seedSubscriptionPlans,
-  getPlans
+  getPlans,
+  updatePlans,
+  deletePlan
 };

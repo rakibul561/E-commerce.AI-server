@@ -5,6 +5,7 @@ import catchAsync from '../../utils/catchAsync';
 import { stripe } from '../../utils/stripe';
 import config from '../../config';
 import { PaymentService } from './payment.service';
+import sendResponse from '../../utils/sendResponse';
 
 export const handleStripeWebhook = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
@@ -68,5 +69,35 @@ export const handleStripeWebhook = catchAsync(
     }
 );
 
+const getAllPayment = catchAsync(async (req: Request, res: Response) => {
 
-export const paymentController = { handleStripeWebhook };
+    const payments = await PaymentService.getAllPayment();
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Payments retrieved successfully",
+        data: payments
+    })
+});
+
+const getPaymentByUser = catchAsync(async (req: Request & { user?: any }, res: Response) => {
+
+    const payments = await PaymentService.getPaymentByUser(req.user.userId);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Payments retrieved successfully",
+        data: payments
+    })
+});
+
+
+
+export const paymentController = {
+    handleStripeWebhook,
+    getAllPayment,
+    getPaymentByUser
+
+};

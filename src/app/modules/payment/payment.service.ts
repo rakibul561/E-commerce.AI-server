@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Stripe from 'stripe';
-import { SubscriptionStatus } from '@prisma/client';
+import { PaymentStatus, SubscriptionStatus } from '@prisma/client';
 import { SUBSCRIPTION_PLANS } from '../../config/subscription.config';
 import { CreditService } from '../credit/credit.service';
 import { stripe } from '../../utils/stripe';
@@ -148,7 +148,15 @@ const handleInvoicePaymentSucceeded = async (
 
     if (!userSubscription) return;
 
+    const exists = await prisma.payment.findUnique({
+        where: { stripeInvoiceId: invoice.id },
+    });
+
+    if (exists) return;
+
     const line = invoice.lines.data[0];
+
+
 
     const currentPeriodStart =
         typeof line?.period?.start === 'number'
@@ -168,6 +176,17 @@ const handleInvoicePaymentSucceeded = async (
             status: 'ACTIVE',
         },
     });
+
+    await prisma.payment.create({
+        data: {
+            userId: userSubscription.userId,
+            stripeInvoiceId: invoice.id,
+            amount: invoice.amount_paid ?? 0,
+            currency: invoice.currency ?? 'usd',
+            status: PaymentStatus.PAID,
+        },
+    });
+
 
     const plan = SUBSCRIPTION_PLANS[userSubscription.tier];
 
@@ -198,8 +217,31 @@ const handleInvoicePaymentFailed = async (
         data: { status: 'PAST_DUE' },
     });
 
+    await prisma.payment.create({
+        data: {
+            userId: userSubscription.userId,
+            stripeInvoiceId: invoice.id,
+            amount: invoice.amount_due ?? 0,
+            currency: invoice.currency ?? 'usd',
+            status: PaymentStatus.FAILED,
+        },
+    });
+
     console.log(`⚠️ Payment failed for user ${userSubscription.userId}`);
 };
+
+const getAllPayment = async () => {
+    return await prisma.payment.findMany();
+};
+
+
+// get payment by user
+const getPaymentByUser = async (userId: string) => {
+    return await prisma.payment.findMany({
+        where: { userId },
+    });
+};
+
 
 
 export const PaymentService = {
@@ -208,4 +250,6 @@ export const PaymentService = {
     handleSubscriptionDeleted,
     handleInvoicePaymentSucceeded,
     handleInvoicePaymentFailed,
+    getAllPayment,
+    getPaymentByUser
 };

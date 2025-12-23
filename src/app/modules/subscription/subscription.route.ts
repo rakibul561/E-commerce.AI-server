@@ -52,6 +52,18 @@ router.post(
     SubscriptionController.seedPlans
 );
 
+router.patch(
+    "/update-plans/:id",
+    auth(Role.ADMIN),
+    SubscriptionController.updatePlans
+);
+
+router.delete(
+    "/delete-plan/:id",
+    auth(Role.ADMIN),
+    SubscriptionController.deletePlan
+)
+
 export const SubscriptionRoutes = router;
 
 
