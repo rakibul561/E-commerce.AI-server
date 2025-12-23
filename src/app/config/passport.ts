@@ -27,7 +27,8 @@ passport.use(
           user = await prisma.user.create({
             data: {
               email,
-              name: profile.displayName,
+              firstName: profile.displayName,
+              lastName: profile.displayName,
               profilePicture: profile.photos?.[0]?.value,
               role: Role.USER,
               isVerified: true,
@@ -67,7 +68,8 @@ passport.use(
           user = await prisma.user.create({
             data: {
               email,
-              name: profile.displayName,
+               firstName: profile.displayName,
+              lastName: profile.displayName,
               profilePicture: profile.photos?.[0]?.value,
               role: Role.USER,
               isVerified: true,

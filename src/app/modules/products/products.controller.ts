@@ -6,9 +6,6 @@ import sendResponse from "../../utils/sendResponse";
 import { ProductService } from "./products.service";
 import { ImageSearchService, VideoSearchService } from "../ai";
 
-/* ===============================
-   CREATE PRODUCT
-================================ */
 const createProduct = catchAsync(async (req: Request, res: Response) => {
   const decodedUser = req.user as any;
   const result = await ProductService.createProduct(
@@ -24,9 +21,6 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-/* ===============================
-   GENERATE PRODUCT TEXT (AI)
-================================ */
 const generateProductText = catchAsync(async (req: Request, res: Response) => {
   const decodedUser = req.user as any;
   const result = await ProductService.generateProductText(
@@ -42,9 +36,6 @@ const generateProductText = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-/* ===============================
-   SEARCH PRODUCT IMAGES
-================================ */
 const searchProductImages = catchAsync(async (req: Request, res: Response) => {
   const { query } = req.query;
 
@@ -70,9 +61,6 @@ const searchProductImages = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-/* ===============================
-   SEARCH PRODUCT VIDEOS
-================================ */
 const searchProductVideos = catchAsync(async (req: Request, res: Response) => {
   const { query } = req.query;
 
@@ -98,9 +86,6 @@ const searchProductVideos = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-/* ===============================
-   GET PRODUCT BY ID
-================================ */
 const getProductById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -114,9 +99,27 @@ const getProductById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-/* ===============================
-   GET ALL PRODUCTS
-================================ */
+const getMyAllProducts = catchAsync(async (req: Request, res: Response) => {
+  const decodedUser = req.user as any;
+
+  const result = await ProductService.getMyAllProducts(
+    decodedUser.userId,
+    req.query
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "My products retrieved successfully",
+    data: {
+      meta: result.meta,
+      items: result.data
+    }
+  });
+});
+
+
+
 const getAllProducts = catchAsync(async (req: Request, res: Response) => {
   const result = await ProductService.getAllProducts(req.query);
 
@@ -128,9 +131,6 @@ const getAllProducts = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-/* ===============================
-   DELETE PRODUCT
-================================ */
 const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   const { productId } = req.params;
 
@@ -144,9 +144,6 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-/* ===============================
-   EXPORT CONTROLLER
-================================ */
 export const ProductController = {
   createProduct,
   generateProductText,
@@ -154,5 +151,6 @@ export const ProductController = {
   searchProductVideos,   
   getAllProducts,
   deleteProduct,
-  getProductById
+  getProductById,
+  getMyAllProducts
 };

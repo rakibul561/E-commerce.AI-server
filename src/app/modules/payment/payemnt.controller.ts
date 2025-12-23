@@ -25,7 +25,6 @@ export const handleStripeWebhook = catchAsync(
                 config.stripe.stripeWebHookSecret as string
             );
         } catch (err: any) {
-            console.error('❌ Webhook signature verification failed:', err.message);
             res.status(400).send(`Webhook Error: ${err.message}`);
             return;
         }

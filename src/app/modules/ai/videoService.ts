@@ -21,9 +21,6 @@ class VideoSearchService {
     });
   }
 
-  /* ===============================
-     YOUTUBE SEARCH
-  =============================== */
   async searchYouTube(query: string, limit = 3): Promise<RelatedVideo[]> {
     try {
       const res = await this.youtubeClient.get("/search", {
@@ -68,9 +65,6 @@ class VideoSearchService {
     }
   }
 
-  /* ===============================
-     PEXELS VIDEO SEARCH
-  =============================== */
   async searchPexels(query: string, limit = 3): Promise<RelatedVideo[]> {
     try {
       const res = await this.pexelsClient.get("/search", {
@@ -109,9 +103,6 @@ class VideoSearchService {
     }
   }
 
-  /* ===============================
-     SMART SEARCH (YT → PEXELS)
-  =============================== */
   async smartSearchByQuery(
     query: string,
     totalLimit = 6
@@ -126,9 +117,6 @@ class VideoSearchService {
     return this.searchPexels(query, totalLimit);
   }
 
-  /* ===============================
-     AI BASED SMART SEARCH
-  =============================== */
   async smartSearch(
     analysis: ImageAnalysisResult,
     totalLimit = 6

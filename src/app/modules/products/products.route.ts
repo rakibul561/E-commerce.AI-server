@@ -38,10 +38,12 @@ router.post(
   checkCredits(2),
   ProductController.generateProductText
 );
+ 
+router.get('/', auth(Role.USER), ProductController.getMyAllProducts)
 
-router.get("/", auth(Role.ADMIN, Role.USER), ProductController.getAllProducts);
+router.get("/all", auth(Role.ADMIN), ProductController.getAllProducts);
 
-router.get("/:id", auth(Role.ADMIN, Role.USER), ProductController.getProductById);
+router.get("/:id", auth(Role.ADMIN), ProductController.getProductById);
 
 router.get(
   "/search/images",
@@ -54,9 +56,6 @@ router.get(
   auth(Role.ADMIN, Role.USER),
   ProductController.searchProductVideos
 );
-
-
-
 
 router.delete(
   "/:productId",

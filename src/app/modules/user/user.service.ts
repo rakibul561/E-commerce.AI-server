@@ -38,7 +38,8 @@ const createUser = async (req: Request) => {
 
   const result = await prisma.user.create({
     data: {
-      name: req.body.name,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
       email: req.body.email,
       password: hashPassword,
       role: req.body.role ?? "USER",
@@ -54,9 +55,6 @@ const createUser = async (req: Request) => {
 
 };
 
-// New: Find or create Google user
-
-// New: Find user by ID (for passport deserialize)
 const findUserById = async (id: string) => {
   try {
     const user = await prisma.user.findUnique({
@@ -93,7 +91,6 @@ const getAllUsers = async (query: Record<string, any>) => {
   };
 };
 
-// New: Get current authenticated user
 const getSingleUser = async (userId: string) => {
   return prisma.user.findUnique({
     where: { id: userId },
@@ -101,7 +98,7 @@ const getSingleUser = async (userId: string) => {
 };
 
 const userUpdateProfile = async (userId: string, payload: any) => {
-  const { name, oldPassword, newPassword, email } = payload;
+  const { oldPassword, newPassword, email,firstName, lastName } = payload;
 
 
   const user = await prisma.user.findUnique({
@@ -115,14 +112,17 @@ const userUpdateProfile = async (userId: string, payload: any) => {
   const updateData: any = {};
 
   // update name
-  if (name) {
-    updateData.name = name;
+  if (firstName) {
+    updateData.firstName = firstName;
+  }
+
+  if(lastName) {
+    updateData.lastName = lastName;
   }
 
   if (email) {
     updateData.email = email
   }
-
 
   // update password
   if (oldPassword && newPassword) {
