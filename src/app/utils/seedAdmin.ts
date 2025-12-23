@@ -21,7 +21,8 @@ export const seedAdmin = async () => {
 
 
         const payload = {
-            name: "Super admin",
+            firstName: "Dm",
+            lastName:"NIko",
             role: Role.ADMIN,
             email: config.admin.email as string,
             password: hashedPassword,
