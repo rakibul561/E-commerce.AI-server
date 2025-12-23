@@ -93,6 +93,37 @@ const getProductById = async (id: string) => {
   });
 };
 
+const getMyAllProducts = async (
+  userId: string,
+  query: Record<string, any>
+) => {
+  const qb = new PrismaQueryBuilder(query)
+    .filter()
+    .search(["title", "category"])
+    .sort()
+    .fields()
+    .paginate();
+
+  const prismaQuery = qb.build();
+
+  // 🔑 Force userId filter (security)
+  prismaQuery.where = {
+    ...prismaQuery.where,
+    userId,
+  };
+
+  const [products, total] = await Promise.all([
+    prisma.product.findMany(prismaQuery),
+    prisma.product.count({ where: prismaQuery.where }),
+  ]);
+
+  return {
+    meta: qb.getMeta(total),
+    data: products,
+  };
+};
+
+
 const getAllProducts = async (query: Record<string, any>) => {
   const qb = new PrismaQueryBuilder(query)
     .filter()
@@ -125,5 +156,7 @@ export const ProductService = {
   generateProductText,
   getAllProducts,
   deleteProduct,
-  getProductById
+  getProductById,
+  getMyAllProducts
+  
 };

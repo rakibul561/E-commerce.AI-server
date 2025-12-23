@@ -99,6 +99,27 @@ const getProductById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyAllProducts = catchAsync(async (req: Request, res: Response) => {
+  const decodedUser = req.user as any;
+
+  const result = await ProductService.getMyAllProducts(
+    decodedUser.userId,
+    req.query
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "My products retrieved successfully",
+    data: {
+      meta: result.meta,
+      items: result.data
+    }
+  });
+});
+
+
+
 const getAllProducts = catchAsync(async (req: Request, res: Response) => {
   const result = await ProductService.getAllProducts(req.query);
 
@@ -130,5 +151,6 @@ export const ProductController = {
   searchProductVideos,   
   getAllProducts,
   deleteProduct,
-  getProductById
+  getProductById,
+  getMyAllProducts
 };
