@@ -55,31 +55,19 @@ const getAiGenerationsToday = async () => {
 };
 
 const getMonthlyRevenue = async () => {
-  const startOfMonth = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    1
-  );
+  const start = new Date();
+  start.setDate(1);
+  start.setHours(0, 0, 0, 0);
 
-  const subscriptions = await prisma.subscription.findMany({
+  const revenue = await prisma.payment.aggregate({
     where: {
-      status: "ACTIVE",
-      createdAt: { gte: startOfMonth },
+      status: 'PAID',
+      createdAt: { gte: start },
     },
-    select: { tier: true },
+    _sum: { amount: true },
   });
 
-  const priceMap: Record<string, number> = {
-    FREE: 0,
-    BASIC: 29,
-    PRO: 79,
-    ENTERPRISE: 199,
-  };
-
-  return subscriptions.reduce(
-    (sum, sub) => sum + (priceMap[sub.tier] || 0),
-    0
-  );
+  return (revenue._sum.amount ?? 0) / 100;
 };
 
 /* ================= PROJECT ANALYTICS (Last 7 Days) ================= */
@@ -87,7 +75,7 @@ const getMonthlyRevenue = async () => {
 const getProjectAnalyticsLast7Days = async () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  
+
   const sevenDaysAgo = new Date(today);
   sevenDaysAgo.setDate(today.getDate() - 6);
 
@@ -112,7 +100,7 @@ const getProjectAnalyticsLast7Days = async () => {
     const date = new Date(today);
     date.setDate(today.getDate() - i);
     const dateStr = date.toISOString().slice(0, 10);
-    
+
     last7Days.push({
       date: dateStr,
       count: countMap[dateStr] || 0,
