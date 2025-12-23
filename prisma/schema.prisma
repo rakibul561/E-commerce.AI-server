@@ -29,6 +29,7 @@ enum SubscriptionStatus {
 enum AuthProvider {
   LOCAL
   GOOGLE
+  FACEBOOK
 }
 
 model User {
@@ -129,4 +130,18 @@ model CreditUsage {
   createdAt DateTime @default(now())
 
   @@map("credit_usage")
+}
+
+model SubscriptionPlan {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  tier            SubscriptionTier @unique @default(FREE)
+  name            String
+  price           Int
+  priceId         String?
+  credits         Int
+  creditsPerMonth Int
+  features        String[]
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }

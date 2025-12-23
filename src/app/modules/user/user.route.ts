@@ -9,6 +9,7 @@ import { UserService } from "./user.service";
 
 const router = express.Router();
 
+// * google login
 router.get(
     "/auth/google",
     passport.authenticate("google", {
@@ -21,6 +22,20 @@ router.get(
     "/auth/google/callback",
     passport.authenticate("google", { session: false }),
     UserService.googleCallback
+);
+
+//* FACEBOOK 
+router.get(
+    "/auth/facebook",
+    passport.authenticate("facebook", { scope: ["email"] })
+);
+
+router.get(
+    "/facebook/callback",
+    passport.authenticate("facebook", { session: false }),
+    (req, res) => {
+        res.redirect("http://localhost:3000/login-success");
+    }
 );
 
 // Existing routes
